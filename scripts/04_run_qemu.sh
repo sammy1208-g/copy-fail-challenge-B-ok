@@ -36,6 +36,8 @@ ${GREEN}════════════════════════
 BANNER
 
 exec qemu-system-x86_64 \
+  -netdev user,id=net0 \
+  -device virtio-net-pci,netdev=net0 \
   -nographic \
   -no-reboot \
   -kernel "$BZIMAGE" \
