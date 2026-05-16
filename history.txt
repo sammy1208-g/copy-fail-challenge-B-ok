@@ -1,0 +1,121 @@
+    # NO ME SALIO TODO EL HISTORY ,YA QUE HUBO UNAS VECES EN LA QEMU SE ME COLGABA ,O BUGEABA Y NO PODÍA SEGUIR.
+    # COMO SOLUCIÓN ERA ABRIR UNA NUEVA TERMINAL Y CERRAr LA QUE NO VALE, PORQUE NO CORRÍA NADA Y AHÍ EJECUTAR COMANDOS CORRECTAMENTE CADA UNO, PARA QUE NO SALGA ERRO. 
+    1  cat /workspaces/copy-fail-challenge-B-ok/scripts/04_run_qemu.sh
+    2  cd /workspaces/copy-fail-challenge-B-ok
+    3  qemu-system-x86_64   -nographic   -no-reboot   -kernel kernel/build/bzImage_vuln   -initrd kernel/build/initramfs.cpio.gz   -append "console=ttyS0 quiet"   -m 512M   -smp 2
+    4  ls /workspaces/copy-fail-challenge-B-ok/
+    5  ls /workspaces/copy-fail-challenge-B-ok/kernel/
+    6  ls /workspaces/copy-fail-challenge-B-ok/kernel/build/
+    7  ls /workspaces/copy-fail-challenge-B-ok/patches/ 2>/dev/null || echo "patches NO existe"
+    8  cat /workspaces/copy-fail-challenge-B-ok/patches/fix_algif_aead.patch
+    9  git -C /workspaces/copy-fail-challenge-B-ok log --oneline -10
+   10  cd /workspaces/copy-fail-challenge-B-ok
+   11  make patch
+   12  cat /workspaces/copy-fail-challenge-B-ok/Makefile
+   13  cd /workspaces/copy-fail-challenge-B-ok/kernel/linux
+   14  git apply ../../patches/fix_algif_aead.patch
+   15  sed -n '270,295p' /workspaces/copy-fail-challenge-B-ok/kernel/linux/crypto/algif_aead.c
+   16  cd /workspaces/copy-fail-challenge-B-ok/kernel/linux
+   17  make -j$(nproc) bzImage 2>&1 | tail -5
+   18  cp /workspaces/copy-fail-challenge-B-ok/kernel/linux/arch/x86/boot/bzImage    /workspaces/copy-fail-challenge-B-ok/kernel/build/bzImage_vuln
+   19  cd /workspaces/copy-fail-challenge-B-ok
+   20  make qemu
+   21  ls -lh /workspaces/copy-fail-challenge-B-ok/kernel/build/
+   22  cat /workspaces/copy-fail-challenge-B-ok/.devcontainer/devcontainer.json | grep -i kernel
+   23  curl -fL "https://github.com/jonathanetitoo/copy-fail-challenge-B/releases/download/kernel-v6.12-vuln/bzImage_vuln"   -o /workspaces/copy-fail-challenge-B-ok/kernel/build/bzImage_vuln
+   24  ls -lh /workspaces/copy-fail-challenge-B-ok/kernel/build/
+   25  cp /workspaces/copy-fail-challenge-B-ok/kernel/build/bzImage_vuln    /workspaces/copy-fail-challenge-B-ok/kernel/build/bzImage_patched
+   26  cd /workspaces/copy-fail-challenge-B-ok
+   27  qemu-system-x86_64   -kernel kernel/build/bzImage_patched   -initrd kernel/build/initramfs.cpio.gz   -append "console=ttyS0 quiet"   -nographic   -no-reboot   -cpu qemu64   -m 256M
+   28  curl -sI "https://github.com/jonathanetitoo/copy-fail-challenge-B/releases/download/kernel-v6.12-vuln/initramfs.cpio.gz" | head -5
+   29  cd /tmp/extract_initramfs
+   30  find . -print0 | cpio --null -o --format=newc 2>/dev/null | gzip -9 > /workspaces/copy-fail-challenge-B-ok/kernel/build/initramfs.cpio.gz
+   31  echo "LISTO"
+   32  cd /workspaces/copy-fail-challenge-B-ok
+   33  qemu-system-x86_64   -kernel kernel/build/bzImage_patched   -initrd kernel/build/initramfs.cpio.gz   -append "console=ttyS0 quiet"   -nographic   -no-reboot   -cpu qemu64   -m 256M
+   34  cd /tmp/extract_initramfs
+   35  chmod 755 .
+   36  chmod 755 home
+   37  chmod 755 home/student
+   38  chmod 1777 tmp
+   39  find . -print0 | cpio --null -o --format=newc 2>/dev/null | gzip -9 > /workspaces/copy-fail-challenge-B-ok/kernel/build/initramfs.cpio.gz
+   40  echo "LISTO"
+   41  cd /workspaces/copy-fail-challenge-B-ok
+   42  qemu-system-x86_64   -kernel kernel/build/bzImage_patched   -initrd kernel/build/initramfs.cpio.gz   -append "console=ttyS0 quiet"   -nographic   -no-reboot   -cpu qemu64   -m 256M
+   43  ps aux | grep qemu
+   44  pkill -f qemu
+   45  cd /workspaces/copy-fail-challenge-B-ok
+   46  qemu-system-x86_64   -kernel kernel/build/bzImage_patched   -initrd kernel/build/initramfs.cpio.gz   -append "console=ttyS0 quiet"   -nographic   -no-reboot   -cpu qemu64   -m 256M   -monitor unix:/tmp/qemu-monitor.sock,server,nowait   -serial unix:/tmp/qemu-serial.sock,server,nowait &
+   47  sleep 20 && socat - unix:/tmp/qemu-serial.sock
+   48  apt-get install -y socat && socat - unix:/tmp/qemu-serial.sock
+   49  echo "info status" | socat - unix:/tmp/qemu-monitor.sock
+   50  echo "sendkey ret" | socat - unix:/tmp/qemu-monitor.sock
+   51  sleep 2
+   52  socat - unix:/tmp/qemu-serial.sock
+   53  pkill -f qemu
+   54  ls /workspaces/copy-fail-challenge-B-ok/kernel/initramfs/
+   55  ls /workspaces/copy-fail-challenge-B-ok/kernel/initramfs/home/student/
+   56  cp /workspaces/copy-fail-challenge-B-ok/kernel/initramfs/root/copy_fail_exp.py    /workspaces/copy-fail-challenge-B-ok/kernel/initramfs/home/student/ 2>/dev/null || find /workspaces/copy-fail-challenge-B-ok/kernel/initramfs -name "*.py" 2>/dev/null
+   57  find /workspaces/copy-fail-challenge-B-ok -name "copy_fail_exp.py" 2>/dev/null
+   58  find / -name "copy_fail_exp.py" 2>/dev/null
+   59  ls -lh /workspaces/copy-fail-challenge-B-ok/kernel/build/
+   60  cd /tmp
+   61  mkdir -p extract_initramfs
+   62  cd extract_initramfs
+   63  zcat /workspaces/copy-fail-challenge-B-ok/kernel/build/initramfs.cpio.gz | cpio -idm 2>/dev/null
+   64  find . -name "*.py" 2>/dev/null
+   65  cp /tmp/extract_initramfs/home/student/copy_fail_exp.py    /workspaces/copy-fail-challenge-B-ok/kernel/initramfs/home/student/
+   66  ls /workspaces/copy-fail-challenge-B-ok/kernel/initramfs/home/student/
+   67  cd /workspaces/copy-fail-challenge-B-ok/kernel/initramfs
+   68  find . -print0 | cpio --null -o --format=newc 2>/dev/null | gzip -9 > /workspaces/copy-fail-challenge-B-ok/kernel/build/initramfs.cpio.gz
+   69  echo "LISTO"
+   70  cd /workspaces/copy-fail-challenge-B-ok
+   71  qemu-system-x86_64   -kernel kernel/build/bzImage_patched   -initrd kernel/build/initramfs.cpio.gz   -append "console=ttyS0 quiet"   -nographic   -no-reboot   -cpu qemu64   -m 256M
+   72  pkill -9 qemu-system-x86_64
+   73  pkill -f qemu
+   74  ps aux | grep qemu
+   75  cd /workspaces/copy-fail-challenge-B-ok
+   76  qemu-system-x86_64   -kernel kernel/build/bzImage_patched   -initrd kernel/build/initramfs.cpio.gz   -append "console=ttyS0 quiet"   -nographic   -no-reboot   -cpu qemu64   -m 256M
+   77  qemu-system-x86_64   -kernel kernel/build/bzImage_patched   -initrd kernel/build/initramfs.cpio.gz   -append "console=ttyS0 earlyprintk=serial quiet"   -serial stdio   -nographic   -no-reboot   -m 256M
+   78  qemu-system-x86_64   -kernel kernel/build/bzImage_patched   -initrd kernel/build/initramfs.cpio.gz   -append "console=ttyS0 earlyprintk=serial quiet"   -nographic   -no-reboot   -m 256M
+   79  free -h
+   80  git -C /workspaces/copy-fail-challenge-B-ok log --oneline -10
+   81  git -C /workspaces/copy-fail-challenge-B-ok tag
+   82  ls /workspaces/copy-fail-challenge-B-ok/evidence/
+   83  ls /workspaces/copy-fail-challenge-B-ok/patches/
+   84  cd /workspaces/copy-fail-challenge-B-ok
+   85  BZIMAGE=kernel/build/bzImage_patched bash scripts/04_run_qemu.sh
+   86  cd /workspaces/copy-fail-challenge-B-ok/kernel/linux
+   87  make -j$(nproc) bzImage 2>&1 | tail -5
+   88  cp /workspaces/copy-fail-challenge-B-ok/kernel/linux/arch/x86/boot/bzImage    /workspaces/copy-fail-challenge-B-ok/kernel/build/bzImage_patched
+   89  cd /workspaces/copy-fail-challenge-B-ok
+   90  BZIMAGE=kernel/build/bzImage_patched bash scripts/04_run_qemu.sh
+   91  cat README.md
+   92  cat evidence/hito1_vuln_confirmed.txt
+   93  cat evidence/hito2_root_shell.txt
+   94  cat evidence/hito3_mitigation.txt
+   95  cat evidence/hito4_patched.txt
+   96  wc -l history.txt
+   97  git config user.email
+   98  mkdir -p screenshots
+   99  ls screenshots/
+  100  mkdir -p screenshots/hito1 screenshots/hito2 screenshots/hito3 screenshots/hito4
+  101  mv screenshots/hito1_kernel_vulnerable_problem_in_busybox.png screenshots/hito1/
+  102  mv screenshots/hito1_kernel_vulnerable_busybox_fixed.png screenshots/hito1/
+  103  mv screenshots/hito1_kernel_vulnerable_qemu_evidence.png screenshots/hito1/
+  104  mv screenshots/hito1_kernel_vulnerable.png screenshots/hito1/
+  105  mv screenshots/hito1_kernel_vulnerable_commit.png screenshots/hito1/
+  106  ls /workspaces/copy-fail-challenge-B-ok/screenshots/
+  107  ls /workspaces/copy-fail-challenge-B-ok/screenshots/hito1/
+  108  ls /workspaces/copy-fail-challenge-B-ok/screenshots/hito2/
+  109  ls /workspaces/copy-fail-challenge-B-ok/screenshots/hito3/
+  110  ls /workspaces/copy-fail-challenge-B-ok/screenshots/hito4/
+  111  cd /workspaces/copy-fail-challenge-B-ok
+  112  git add README.md capturas/
+  113  git commit -m "docs: README actualizado con capturas de evidencia - $(date +%Y-%m-%dT%H:%M)"
+  114  git push origin copy-fail-challenge-B-ox-test
+  115  git add README.md screenshots/
+  116  git commit -m "docs: README actualizado con capturas de evidencia - $(date +%Y-%m-%dT%H:%M)"
+  117  git push origin copy-fail-challenge-B-ox-test
+  118  history
+
